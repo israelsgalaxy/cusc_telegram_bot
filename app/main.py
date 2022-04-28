@@ -1,18 +1,19 @@
 import os
 
-import mongo
+from app import mongo
 
 import telebot
+from flask import Flask, request
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-TOKEN = os.environ["TOKEN2"]
-PRO = int(os.environ["PRO"])
+TOKEN = os.environ["TOKEN"]
 CHAIRMAN = int(os.environ["CHAIRMAN"])
-AGS = int(os.environ["AGS"])
-ADMIN = [CHAIRMAN, PRO, AGS]
+PRO = int(os.environ["PRO"])
+ADMIN = [CHAIRMAN, PRO]
+server = Flask(__name__)
 
 categories = {
     "500": ["DAN", "EIE500", "EEE22", "CU2022"],
@@ -106,4 +107,20 @@ def save_new_image(message):
     mongo.change_image_id(image_id)
 
 
-bot.infinity_polling()
+@server.route("/" + TOKEN, methods=["POST"])
+def getMessage():
+    json_string = request.get_data().decode("utf-8")
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "!", 200
+
+
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url="https://cusc-bot.herokuapp.com/" + TOKEN)
+    return "!", 200
+
+
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
