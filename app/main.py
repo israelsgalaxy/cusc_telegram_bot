@@ -59,11 +59,13 @@ I am the CUSC Bot
 @bot.message_handler(commands=['start'])
 def start_message_handler(message):
     chat = message.chat
+    mongo.insert_new_user(chat.id, chat.type)
 
+    if chat.type != "private":
+        return
     if chat.id not in ADMIN:
         bot.reply_to(message=message, text=start_message_text,
                      parse_mode="MarkdownV2")
-        mongo.insert_new_user(chat.id, chat.type)
         return
     bot.reply_to(message=message,
                  text=f"Hello {chat.first_name.split(' ')[0].title()},\n"+admin_start_message, parse_mode="MarkdownV2")
