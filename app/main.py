@@ -86,6 +86,9 @@ def start_message_handler(message):
 
 @bot.message_handler(func=lambda message: message.text.startswith("/sendphoto"))
 def broadcast_photo(message):
+    # Get a list of receivers categories
+    receivers = message.text.split('\n')[1]
+
     chat = message.chat
 
     if chat.id not in ADMIN:
@@ -116,8 +119,6 @@ def broadcast_photo(message):
                       caption=message_text, photo=image_id)
         return
 
-    # Get a list of receivers categories
-    receivers = message.text.split('\n')[1]
     receivers_list = [reciever.strip() for reciever in receivers.split(",")]
     group_names = [
         group_name for item in receivers_list for group_name in categories[item]]
