@@ -1,6 +1,7 @@
 import os
 
-from app import mongo
+# from app import mongo
+import mongo
 
 import telebot
 from flask import Flask, request
@@ -11,9 +12,8 @@ load_dotenv()
 
 TOKEN = os.environ["TOKEN"]
 CHAIRMAN = int(os.environ["CHAIRMAN"])
-AGS = int(os.environ["AGS"])
 PRO = int(os.environ["PRO"])
-ADMIN = [CHAIRMAN, PRO, AGS]
+ADMIN = [CHAIRMAN, PRO]
 server = Flask(__name__)
 
 categories = {
@@ -74,6 +74,7 @@ def start_message_handler(message):
 
 @bot.message_handler(func=lambda message: message.text.startswith("/sendphoto"))
 def broadcast_photo(message):
+    receivers = message.text.split('\n')[1]
     chat = message.chat
 
     if chat.id not in ADMIN:
@@ -87,25 +88,36 @@ def broadcast_photo(message):
     if receivers.strip().lower() == "all":
         ids = mongo.get_ids()
         for id in ids:
-            bot.send_photo(chat_id=id, caption=message_text, photo=image_id)
+            try:
+                bot.send_photo(
+                    chat_id=id, caption=message_text, photo=image_id)
+            except:
+                continue
         return
 
     # Broadcast to dms only
     if receivers.strip().lower() == "private":
         ids = mongo.get_ids(chat_type="private")
         for id in ids:
-            bot.send_photo(chat_id=id, caption=message_text, photo=image_id)
+            try:
+                bot.send_photo(
+                    chat_id=id, caption=message_text, photo=image_id)
+            except:
+                continue
         return
 
     # Broadcast to groups only
     if receivers.strip().lower() == "groups":
         ids = mongo.get_ids(chat_type="supergroup")
         for id in ids:
-            bot.send_photo(chat_id=id, caption=message_text, photo=image_id)
+            try:
+                bot.send_photo(
+                    chat_id=id, caption=message_text, photo=image_id)
+            except:
+                continue
         return
 
     # Get a list of receivers categories
-    receivers = message.text.split('\n')[1]
     receivers_list = [reciever.strip() for reciever in receivers.split(",")]
     group_names = [
         group_name for item in receivers_list for group_name in categories[item]]
@@ -113,11 +125,15 @@ def broadcast_photo(message):
     # Broadcast Photo to all categories
     group_ids = mongo.get_group_ids(group_names)
     for id in group_ids:
-        bot.send_photo(chat_id=id, caption=message_text, photo=image_id)
+        try:
+            bot.send_photo(chat_id=id, caption=message_text, photo=image_id)
+        except:
+            continue
 
 
 @bot.message_handler(func=lambda message: message.chat.id in ADMIN)
 def broadcast_message(message):
+    receivers_list = [reciever.strip() for reciever in receivers.split(",")]
 
     # Get message text
     message_text = '\n'.join(message.text.split('\n')[1:])
@@ -129,31 +145,42 @@ def broadcast_message(message):
     if receivers.strip().lower() == "all":
         ids = mongo.get_ids()
         for id in ids:
-            bot.send_message(chat_id=id, text=message_text)
+            try:
+                bot.send_message(chat_id=id, text=message_text)
+            except:
+                continue
         return
 
     # Broadcast to dms only
     if receivers.strip().lower() == "private":
         ids = mongo.get_ids(chat_type="private")
         for id in ids:
-            bot.send_message(chat_id=id, text=message_text)
+            try:
+                bot.send_message(chat_id=id, text=message_text)
+            except:
+                continue
         return
 
     # Broadcast to groups only
     if receivers.strip().lower() == "groups":
         ids = mongo.get_ids(chat_type="supergroup")
         for id in ids:
-            bot.send_message(chat_id=id, text=message_text)
+            try:
+                bot.send_message(chat_id=id, text=message_text)
+            except:
+                continue
         return
 
     # Broadcast to custom set of groups
-    receivers_list = [reciever.strip() for reciever in receivers.split(",")]
     group_names = [
         group_name for item in receivers_list for group_name in categories[item]]
 
     group_ids = mongo.get_group_ids(group_names)
     for id in group_ids:
-        bot.send_message(chat_id=id, text=message_text)
+        try:
+            bot.send_message(chat_id=id, text=message_text)
+        except:
+            continue
 
 
 @bot.message_handler(content_types=["photo"])
