@@ -132,13 +132,13 @@ def broadcast_photo(message):
 
 @bot.message_handler(func=lambda message: message.chat.id in ADMIN)
 def broadcast_message(message):
+    # Get a list of receivers categories
+    receivers = message.text.split('\n')[0]
+
     receivers_list = [reciever.strip() for reciever in receivers.split(",")]
 
     # Get message text
     message_text = '\n'.join(message.text.split('\n')[1:])
-
-    # Get a list of receivers categories
-    receivers = message.text.split('\n')[0]
 
     # Broadcast to all users
     if receivers.strip().lower() == "all":
