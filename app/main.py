@@ -12,7 +12,7 @@ TOKEN = os.environ["TOKEN2"]
 PRO = int(os.environ["PRO"])
 CHAIRMAN = int(os.environ["CHAIRMAN"])
 AGS = int(os.environ["AGS"])
-ADMIN = [CHAIRMAN, PRO]
+ADMIN = [CHAIRMAN, PRO, AGS]
 
 categories = {
     "500": ["DAN", "EIE500", "EEE22", "CU2022"],
