@@ -1,6 +1,8 @@
 import os
+import time
 
 import mongo
+
 
 import telebot
 
@@ -55,6 +57,18 @@ I am the CUSC Bot
 """
 
 
+def send_messages(ids: str, func, **kwargs):
+    count = 0
+    for id in ids:
+        try:
+            func(id, **kwargs)
+            count += 1
+        except:
+            continue
+        if count % 20 == 0:
+            time.sleep(.7)
+
+
 @bot.message_handler(commands=['start'])
 def start_message_handler(message):
     chat = message.chat
@@ -84,22 +98,22 @@ def broadcast_photo(message):
     # Broadcast to all users
     if receivers.strip().lower() == "all":
         ids = mongo.get_ids()
-        for id in ids:
-            bot.send_photo(chat_id=id, caption=message_text, photo=image_id)
+        send_messages(ids, bot.send_photo,
+                      caption=message_text, photo=image_id)
         return
 
     # Broadcast to dms only
     if receivers.strip().lower() == "private":
         ids = mongo.get_ids(chat_type="private")
-        for id in ids:
-            bot.send_photo(chat_id=id, caption=message_text, photo=image_id)
+        send_messages(ids, bot.send_photo,
+                      caption=message_text, photo=image_id)
         return
 
     # Broadcast to groups only
     if receivers.strip().lower() == "groups":
         ids = mongo.get_ids(chat_type="supergroup")
-        for id in ids:
-            bot.send_photo(chat_id=id, caption=message_text, photo=image_id)
+        send_messages(ids, bot.send_photo,
+                      caption=message_text, photo=image_id)
         return
 
     # Get a list of receivers categories
@@ -110,8 +124,9 @@ def broadcast_photo(message):
 
     # Broadcast Photo to all categories
     group_ids = mongo.get_group_ids(group_names)
-    for id in group_ids:
-        bot.send_photo(chat_id=id, caption=message_text, photo=image_id)
+
+    send_messages(group_ids, bot.send_photo,
+                  caption=message_text, photo=image_id)
 
 
 @bot.message_handler(func=lambda message: message.chat.id in ADMIN)
@@ -126,22 +141,22 @@ def broadcast_message(message):
     # Broadcast to all users
     if receivers.strip().lower() == "all":
         ids = mongo.get_ids()
-        for id in ids:
-            bot.send_message(chat_id=id, text=message_text)
+        send_messages(ids, bot.send_message,
+                      text=message_text)
         return
 
     # Broadcast to dms only
     if receivers.strip().lower() == "private":
         ids = mongo.get_ids(chat_type="private")
-        for id in ids:
-            bot.send_message(chat_id=id, text=message_text)
+        send_messages(ids, bot.send_message,
+                      text=message_text)
         return
 
     # Broadcast to groups only
     if receivers.strip().lower() == "groups":
         ids = mongo.get_ids(chat_type="supergroup")
-        for id in ids:
-            bot.send_message(chat_id=id, text=message_text)
+        send_messages(ids, bot.send_message,
+                      text=message_text)
         return
 
     # Broadcast to custom set of groups
@@ -150,8 +165,8 @@ def broadcast_message(message):
         group_name for item in receivers_list for group_name in categories[item]]
 
     group_ids = mongo.get_group_ids(group_names)
-    for id in group_ids:
-        bot.send_message(chat_id=id, text=message_text)
+    send_messages(group_ids, bot.send_message,
+                  text=message_text)
 
 
 @bot.message_handler(content_types=["photo"])
@@ -165,4 +180,4 @@ def save_new_image(message):
     mongo.change_image_id(image_id)
 
 
-bot.infinity_polling()
+# bot.infinity_polling()
