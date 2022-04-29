@@ -12,7 +12,7 @@ TOKEN = os.environ["TOKEN2"]
 PRO = int(os.environ["PRO"])
 CHAIRMAN = int(os.environ["CHAIRMAN"])
 AGS = int(os.environ["AGS"])
-ADMIN = [CHAIRMAN, PRO, AGS]
+ADMIN = [CHAIRMAN, PRO]
 
 categories = {
     "500": ["DAN", "EIE500", "EEE22", "CU2022"],
@@ -25,10 +25,9 @@ categories = {
 
 
 bot = telebot.TeleBot(TOKEN)
-start_message_text = """Hi there !!! 👋\n\nI'm CUSC bot 🤖, the official bot of the CU Student Council.
-I'm here to give you first hand information and news concerning student life on campus 🏫.
-You can also connect with the student council through the official Instagram page:
-https://www.instagram.com/studentcouncil_cu/\n\nStay tuned!!! 💥
+start_message_text = """Hi there \!\!\! 👋\n\nI'm CUSC bot 🤖, the official bot of the CU Student Council\.
+I'm here to give you first hand information and news concerning student life on campus 🏫\.
+You can also connect with the student council through the [official Instagram page](https://www.instagram.com/studentcouncil_cu/):\n\nStay tuned\!\!\! 💥
 """
 
 admin_start_message = """
@@ -61,7 +60,8 @@ def start_message_handler(message):
     chat = message.chat
 
     if chat.id not in ADMIN:
-        bot.reply_to(message=message, text=start_message_text)
+        bot.reply_to(message=message, text=start_message_text,
+                     parse_mode="MarkdownV2")
         mongo.insert_new_user(chat.id, chat.type)
         return
     bot.reply_to(message=message,
