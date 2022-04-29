@@ -11,14 +11,9 @@ load_dotenv()
 
 TOKEN = os.environ["TOKEN"]
 CHAIRMAN = int(os.environ["CHAIRMAN"])
-<<<<<<< HEAD
 PRO = int(os.environ["PRO"])
 ADMIN = [CHAIRMAN, PRO]
 server = Flask(__name__)
-=======
-AGS = int(os.environ["AGS"])
-ADMIN = [CHAIRMAN, PRO]
->>>>>>> dev
 
 categories = {
     "500": ["DAN", "EIE500", "EEE22", "CU2022"],
