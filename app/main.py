@@ -1,7 +1,6 @@
 import os
 
-# from app import mongo
-import mongo
+from app import mongo
 
 import telebot
 from flask import Flask, request
