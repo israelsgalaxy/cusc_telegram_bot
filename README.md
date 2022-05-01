@@ -29,3 +29,7 @@ HackerManPeter
 
 - [LinkedIn](www.linkedin.com/in/pebueku)
 - [dev.to](https://dev.to/hackermanpeter)
+
+Galadima Israel
+
+- [Telegram](https://t.me/israelsgalaxy)
