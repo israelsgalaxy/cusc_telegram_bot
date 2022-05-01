@@ -56,13 +56,17 @@ I am the CUSC Bot
     The "all" and "private" categories cannot be used with any other category
 """
 
+message_dict = dict()
+
 
 def send_messages(ids: str, func, **kwargs):
+    message_dict.clear()
     count = 0
     for id in ids:
         try:
-            func(id, **kwargs)
+            message_object = func(id, **kwargs)
             count += 1
+            message_dict[message_object.chat.id] = message_object.id
         except:
             continue
         if count % 20 == 0:
@@ -82,6 +86,16 @@ def start_message_handler(message):
         return
     bot.reply_to(message=message,
                  text=f"Hello {chat.first_name.split(' ')[0].title()},\n"+admin_start_message, parse_mode="MarkdownV2")
+
+
+@bot.message_handler(commands=["deletemessage"])
+def delete_messages(message):
+    chat = message.chat
+    if chat.id not in ADMIN:
+        return
+
+    for chat_id, message_id in message_dict.items():
+        bot.delete_message(chat_id=chat_id, message_id=message_id)
 
 
 @bot.message_handler(func=lambda message: message.text.startswith("/sendphoto"))
