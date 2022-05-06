@@ -198,7 +198,7 @@ def broadcast_message(message):
 
 
 @bot.message_handler(content_types=["photo", "document"])
-def save_new_image(message):
+def save_new_media(message):
     chat = message.chat
 
     if chat.id not in ADMIN:
