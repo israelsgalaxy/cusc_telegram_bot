@@ -99,37 +99,51 @@ def delete_messages(message):
         bot.delete_message(chat_id=chat_id, message_id=message_id)
 
 
-@bot.message_handler(func=lambda message: message.text.startswith("/sendphoto"))
+@bot.message_handler(func=lambda message: message.text.startswith("/sendmedia"))
 def broadcast_photo(message):
-    receivers = message.text.split('\n')[1]
     chat = message.chat
 
     if chat.id not in ADMIN:
         return
-    image_id = mongo.get_image_id()
+
+    # Initialise items
+    receivers = message.text.split('\n')[1].strip().lower()
+    type = message.text.split('\n')[-1].strip().lower()
+    media_id = mongo.get_media_id(type=type)
 
     # Get message text
-    message_text = '\n'.join(message.text.split('\n')[2:])
+    message_text = '\n'.join(message.text.split('\n')[2:-1])
+
+    if type == "photo":
+        func = bot.send_photo
+        kw_args = {
+            "caption": message_text,
+            "photo": media_id,
+        }
+    elif type == "document":
+        func = bot.send_document
+        kw_args = {
+            "caption": message_text,
+            "document": media_id,
+        }
 
     # Broadcast to all users
-    if receivers.strip().lower() == "all":
+    if receivers == "all":
         ids = mongo.get_ids()
-        send_messages(ids, bot.send_photo,
-                      caption=message_text, photo=image_id)
+        send_messages(ids, func, **kw_args)
         return
 
     # Broadcast to dms only
-    if receivers.strip().lower() == "private":
-        ids = mongo.get_ids(chat_type="private")
-        send_messages(ids, bot.send_photo,
-                      caption=message_text, photo=image_id)
+    if receivers == "private":
+        # ids = mongo.get_ids(chat_type="private")
+        ids = ADMIN
+        send_messages(ids, func, **kw_args)
         return
 
     # Broadcast to groups only
-    if receivers.strip().lower() == "groups":
+    if receivers == "groups":
         ids = mongo.get_ids(chat_type="supergroup")
-        send_messages(ids, bot.send_photo,
-                      caption=message_text, photo=image_id)
+        send_messages(ids, func, **kw_args)
         return
 
     # Get a list of receivers categories
@@ -139,9 +153,7 @@ def broadcast_photo(message):
 
     # Broadcast Photo to all categories
     group_ids = mongo.get_group_ids(group_names)
-
-    send_messages(group_ids, bot.send_photo,
-                  caption=message_text, photo=image_id)
+    send_messages(group_ids, func, kw_args)
 
 
 @bot.message_handler(func=lambda message: message.chat.id in ADMIN)
@@ -155,21 +167,22 @@ def broadcast_message(message):
     message_text = '\n'.join(message.text.split('\n')[1:])
 
     # Broadcast to all users
-    if receivers.strip().lower() == "all":
+    if receivers == "all":
         ids = mongo.get_ids()
         send_messages(ids, bot.send_message,
                       text=message_text)
         return
 
     # Broadcast to dms only
-    if receivers.strip().lower() == "private":
-        ids = mongo.get_ids(chat_type="private")
+    if receivers == "private":
+        # ids = mongo.get_ids(chat_type="private")
+        ids = ADMIN
         send_messages(ids, bot.send_message,
                       text=message_text)
         return
 
     # Broadcast to groups only
-    if receivers.strip().lower() == "groups":
+    if receivers == "groups":
         ids = mongo.get_ids(chat_type="supergroup")
         send_messages(ids, bot.send_message,
                       text=message_text)
@@ -184,15 +197,20 @@ def broadcast_message(message):
                   text=message_text)
 
 
-@bot.message_handler(content_types=["photo"])
+@bot.message_handler(content_types=["photo", "document"])
 def save_new_image(message):
     chat = message.chat
 
     if chat.id not in ADMIN:
         return
 
-    image_id = message.photo[0].file_id
-    mongo.change_image_id(image_id)
+    if message.photo:
+        media_id = message.photo[0].file_id
+        type = "photo"
+    elif message.document:
+        type = "document"
+        media_id = message.document.file_id
+    mongo.change_media_id(media_id, type=type)
 
 
 @server.route("/" + TOKEN, methods=["POST"])

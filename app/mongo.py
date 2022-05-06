@@ -41,16 +41,16 @@ def get_group_ids(group_names: list):
     return [bot_users.find({"group_name": item})[0]["_id"] for item in group_names]
 
 
-def change_image_id(id: int) -> None:
+def change_media_id(id: int, type: str) -> None:
     """
     change image id
     """
+    image.update_one({"_id": f"{type}"}, {"$set": {f"{type}_id": id}})
+    print("successfully updated")
 
-    image.update_one({"_id": "image"}, {"$set": {"image_id": id}})
 
-
-def get_image_id() -> str:
+def get_media_id(type: str) -> str:
     """
     Get Image ID from mongo
     """
-    return image.find({"_id": "image"})[0]["image_id"]
+    return image.find({"_id": f"{type}"})[0][f"{type}_id"]
