@@ -135,8 +135,7 @@ def broadcast_photo(message):
 
     # Broadcast to dms only
     if receivers == "private":
-        # ids = mongo.get_ids(chat_type="private")
-        ids = ADMIN
+        ids = mongo.get_ids(chat_type="private")
         send_messages(ids, func, **kw_args)
         return
 
@@ -159,7 +158,7 @@ def broadcast_photo(message):
 @bot.message_handler(func=lambda message: message.chat.id in ADMIN)
 def broadcast_message(message):
     # Get a list of receivers categories
-    receivers = message.text.split('\n')[0]
+    receivers = message.text.split('\n')[0].strip().lower()
 
     receivers_list = [reciever.strip() for reciever in receivers.split(",")]
 
