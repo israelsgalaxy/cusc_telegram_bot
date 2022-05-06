@@ -46,11 +46,20 @@ categories \= \{
 
 Example
 ```
-/sendphoto
+/sendmedia
 100,200,300
 I am the CUSC Bot
+photo
 ```
     This would send the a photo with the caption "I am the CUSC Bot" to "FRESH", "CU2425" and "CU300"
+
+```
+/sendmedia
+all
+Revalidation Form
+document
+```
+    This would send the a file with the caption "Revalidation Form" to all groups and private users
 
 **NOTE:**
     The "all" and "private" categories cannot be used with any other category
