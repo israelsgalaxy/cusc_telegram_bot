@@ -174,8 +174,7 @@ def broadcast_message(message):
 
     # Broadcast to dms only
     if receivers == "private":
-        # ids = mongo.get_ids(chat_type="private")
-        ids = ADMIN
+        ids = mongo.get_ids(chat_type="private")
         send_messages(ids, bot.send_message,
                       text=message_text)
         return
