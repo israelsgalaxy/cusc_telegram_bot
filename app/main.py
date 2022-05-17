@@ -1,5 +1,6 @@
 import os
 import time
+from typing import List
 
 import mongo
 
@@ -68,7 +69,7 @@ document
 message_dict = dict()
 
 
-def send_messages(ids: str, func, **kwargs):
+def send_messages(ids: List[str], func, **kwargs):
     message_dict.clear()
     count = 0
     for id in ids:

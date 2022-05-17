@@ -15,7 +15,7 @@ bot_users = db.councilBotUsers
 image = db.images
 
 
-def insert_new_user(id: int, chat_type) -> None:
+def insert_new_user(id: int, chat_type: str) -> None:
     """
     Adds a participant to the leaderboard
     """
