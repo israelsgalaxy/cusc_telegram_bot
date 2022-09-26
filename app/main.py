@@ -15,7 +15,8 @@ load_dotenv()
 TOKEN = os.environ["TOKEN"]
 CHAIRMAN = int(os.environ["CHAIRMAN"])
 PRO = int(os.environ["PRO"])
-ADMIN = [CHAIRMAN, PRO]
+AGS = int(os.environ["AGS"])
+ADMIN = [CHAIRMAN, PRO, AGS]
 server = Flask(__name__)
 
 categories = {
