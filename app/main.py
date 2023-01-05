@@ -134,9 +134,8 @@ def send_messages(ids: List[str], func, **kwargs):
 
 @bot.message_handler(commands=['start'])
 def start_message_handler(message):
-    print(message.chat.id)
     chat = message.chat
-    mongo.insert_new_user(chat.id, chat.type)
+    # mongo.insert_new_user(chat.id, chat.type)
 
     if chat.type != "private":
         return
