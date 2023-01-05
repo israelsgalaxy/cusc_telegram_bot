@@ -11,9 +11,8 @@ CONNECTION_STRING = os.environ["CONNECTION_STRING"]
 client = MongoClient(CONNECTION_STRING)
 
 db = client.get_default_database()
-bot_users = db.councilBotUsers
-image = db.images
-
+bot_users = db.Users
+image = db.Images
 
 def insert_new_user(id: int, chat_type: str) -> None:
     """
@@ -37,15 +36,15 @@ def get_ids(**kwargs):
     return [user["_id"] for user in all_users]
 
 
-def get_group_ids(group_names: list):
-    return [bot_users.find({"group_name": item})[0]["_id"] for item in group_names]
+# def get_group_ids(group_names: list):
+#     return [bot_users.find({"group_name": item})[0]["_id"] for item in group_names]
 
 
 def change_media_id(id: int, type: str) -> None:
     """
     change image id
     """
-    image.update_one({"_id": f"{type}"}, {"$set": {f"{type}_id": id}})
+    image.update_one({"_id": f"{type}"}, {"$set": {f"{type}_id": id}}, upsert=True)
     print("successfully updated")
 
 

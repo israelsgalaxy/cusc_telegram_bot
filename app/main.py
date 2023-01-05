@@ -13,10 +13,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.environ["TOKEN"]
-CHAIRMAN = int(os.environ["CHAIRMAN"])
+URL = os.environ["URL"]
+
+CHMN = int(os.environ["CHMN"])
+VCM = int(os.environ["VCM"])
+VCF = int(os.environ["VCF"])
+EXECSEC = int(os.environ["EXECSEC"])
 PRO = int(os.environ["PRO"])
-AGS = int(os.environ["AGS"])
-ADMIN = [CHAIRMAN, PRO, AGS]
+
+ADMIN = [CHMN, VCM, VCF, EXECSEC, PRO]
 server = Flask(__name__)
 
 categories = {
@@ -28,6 +33,20 @@ categories = {
     "400": ["DAN", "EIE400"]
 }
 
+new_group_ids = {
+    # CHAP AEIES CUMCH CUCHM CUMD CUSC 
+    "gen": [-1001158265107, -1001318860489, -1001433686986, -1001490202977, -1001785807218, -1001682826754],
+    # FRESH DEB
+    "100": [-1001655184402, -1001536886384],
+    # CU2425 DEB MARY
+    "200": [-1001444929539, -1001536886384, -1001494532036],
+    # CU300 DEB MARY
+    "300": [-1001218549305, -1001536886384, -1001494532036],
+    # EIE400 DAN 
+    "400": [-1001315029935, -1001563004586],
+    # DAN EIE500 CU2022 EEE22 
+    "500": [-1001563004586, -1001406974184, -1001572957944, -100398271332]
+}
 
 bot = telebot.TeleBot(TOKEN)
 start_message_text = """Hi there \!\!\! 👋\n\nI'm CUSC bot 🤖, the official bot of the CU Student Council\.
@@ -36,18 +55,50 @@ You can also connect with the student council through the [official Instagram pa
 """
 
 admin_start_message = """
-categories \= \{
-    "500": ["DAN", "EIE500", "EEE22", "CU2022"],
-    "gen": ["CHAP", "AEIES", "CUMCH", "CUCHM", "CUMD", "CUSC"],
-    "100": ["FRESH"],
-    "200": ["CU2425"],
-    "300": ["CU300"],
-    "400": ["DAN", "EIE400"]
-    "all": \- Groups and DMs
-    "private": \- Dms Only
-\}
+All messages to this bot should follow either of these two formats:
+
+1) To broadcast a message:
+[categories]
+[message]
+
+2) To broadcast a message with an attachment (photo or document):
+/sendmedia
+[categories]
+[message]
+[media_type]
+
+Here are the meanings and possible values of each field above:
+
+- categories
+Is a comma-separated list of groupings you wish to broadcast your message to
+Can be any combination of gen,100,200,300,400,500,private,all
+
+gen comprises of all general groups
+100 comprises of all 100 level groups
+200 comprises of all 200 level groups
+300 comprises of all 300 level groups
+400 comprises of all 400 level groups
+500 comprises of all 500 level groups
+private comprises of all DMs
+all comprises of all groups and DMs
+
+**NOTE:**
+    The "all" and "private" categories cannot be used with any other category
+
+- message
+Is the message content you wish to broadcast
+
+- media_type
+Specifies what type of attachment you are including with your message
+Can be either photo or document
 
 Example
+```
+private
+Chapel Service is by 10pm today
+```
+    This would send the message "Chapel Service is by 10pm today" to only DMs
+
 ```
 /sendmedia
 100,200,300
@@ -63,9 +114,6 @@ Revalidation Form
 document
 ```
     This would send the a file with the caption "Revalidation Form" to all groups and private users
-
-**NOTE:**
-    The "all" and "private" categories cannot be used with any other category
 """
 
 message_dict = dict()
@@ -158,11 +206,11 @@ def broadcast_photo(message):
 
     # Get a list of receivers categories
     receivers_list = [reciever.strip() for reciever in receivers.split(",")]
-    group_names = [
-        group_name for item in receivers_list for group_name in categories[item]]
+    group_ids = [
+        group_id for item in receivers_list for group_id in new_group_ids[item]]
 
     # Broadcast Photo to all categories
-    group_ids = mongo.get_group_ids(group_names)
+    # group_ids = mongo.get_group_ids(group_names)
     send_messages(group_ids, func, kw_args)
 
 
@@ -198,10 +246,10 @@ def broadcast_message(message):
         return
 
     # Broadcast to custom set of groups
-    group_names = [
-        group_name for item in receivers_list for group_name in categories[item]]
+    group_ids = [
+        group_id for item in receivers_list for group_id in new_group_ids[item]]
 
-    group_ids = mongo.get_group_ids(group_names)
+    # group_ids = mongo.get_group_ids(group_names)
     send_messages(group_ids, bot.send_message,
                   text=message_text)
 
@@ -233,9 +281,10 @@ def getMessage():
 @server.route("/")
 def webhook():
     bot.remove_webhook()
-    bot.set_webhook(url="https://cusc-bot.herokuapp.com/" + TOKEN)
+    bot.set_webhook(url=URL + TOKEN)
     return "!", 200
 
 
 if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+  bot.remove_webhook()
+  server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
