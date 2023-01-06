@@ -2,7 +2,7 @@ import os
 import time
 from typing import List
 
-from app import mongo
+from .mongo import insert_new_user, get_ids, change_media_id, get_media_id
 
 import telebot
 from flask import Flask, request
@@ -135,7 +135,7 @@ def send_messages(ids: List[str], func, **kwargs):
 @bot.message_handler(commands=['start'])
 def start_message_handler(message):
     chat = message.chat
-    # mongo.insert_new_user(chat.id, chat.type)
+    # insert_new_user(chat.id, chat.type)
 
     if chat.type != "private":
         return
@@ -167,7 +167,7 @@ def broadcast_photo(message):
     # Initialise items
     receivers = message.text.split('\n')[1].strip().lower()
     type = message.text.split('\n')[-1].strip().lower()
-    media_id = mongo.get_media_id(type=type)
+    media_id = get_media_id(type=type)
 
     # Get message text
     message_text = '\n'.join(message.text.split('\n')[2:-1])
@@ -187,19 +187,19 @@ def broadcast_photo(message):
 
     # Broadcast to all users
     if receivers == "all":
-        ids = mongo.get_ids()
+        ids = get_ids()
         send_messages(ids, func, **kw_args)
         return
 
     # Broadcast to dms only
     if receivers == "private":
-        ids = mongo.get_ids(chat_type="private")
+        ids = get_ids(chat_type="private")
         send_messages(ids, func, **kw_args)
         return
 
     # Broadcast to groups only
     if receivers == "groups":
-        ids = mongo.get_ids(chat_type="supergroup")
+        ids = get_ids(chat_type="supergroup")
         send_messages(ids, func, **kw_args)
         return
 
@@ -209,7 +209,7 @@ def broadcast_photo(message):
         group_id for item in receivers_list for group_id in new_group_ids[item]]
 
     # Broadcast Photo to all categories
-    # group_ids = mongo.get_group_ids(group_names)
+    # group_ids = get_group_ids(group_names)
     send_messages(group_ids, func, kw_args)
 
 
@@ -225,21 +225,21 @@ def broadcast_message(message):
 
     # Broadcast to all users
     if receivers == "all":
-        ids = mongo.get_ids()
+        ids = get_ids()
         send_messages(ids, bot.send_message,
                       text=message_text)
         return
 
     # Broadcast to dms only
     if receivers == "private":
-        ids = mongo.get_ids(chat_type="private")
+        ids = get_ids(chat_type="private")
         send_messages(ids, bot.send_message,
                       text=message_text)
         return
 
     # Broadcast to groups only
     if receivers == "groups":
-        ids = mongo.get_ids(chat_type="supergroup")
+        ids = get_ids(chat_type="supergroup")
         send_messages(ids, bot.send_message,
                       text=message_text)
         return
@@ -248,7 +248,7 @@ def broadcast_message(message):
     group_ids = [
         group_id for item in receivers_list for group_id in new_group_ids[item]]
 
-    # group_ids = mongo.get_group_ids(group_names)
+    # group_ids = get_group_ids(group_names)
     send_messages(group_ids, bot.send_message,
                   text=message_text)
 
@@ -266,7 +266,7 @@ def save_new_media(message):
     elif message.document:
         type = "document"
         media_id = message.document.file_id
-    mongo.change_media_id(media_id, type=type)
+    change_media_id(media_id, type=type)
 
 
 @server.route("/" + TOKEN, methods=["POST"])
@@ -284,6 +284,6 @@ def webhook():
     return "!", 200
 
 
-if __name__ == "__main__":
-  print("Bot is alive")
-  server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+# if __name__ == "__main__":
+#   print("Bot is alive")
+#   server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
