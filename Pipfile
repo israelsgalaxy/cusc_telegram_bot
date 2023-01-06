@@ -10,7 +10,6 @@ schedule = "*"
 flask = "*"
 pymongo = {extras = ["srv"], version = "*"}
 gunicorn = "*"
-waitress = "*"
 
 [dev-packages]
 autopep8 = "*"
