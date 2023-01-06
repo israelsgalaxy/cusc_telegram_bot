@@ -14,6 +14,8 @@ load_dotenv()
 TOKEN = os.environ["TOKEN"]
 VERCEL_URL = os.environ["VERCEL_URL"]
 
+print(VERCEL_URL)
+
 CHMN = int(os.environ["CHMN"])
 VCM = int(os.environ["VCM"])
 VCF = int(os.environ["VCF"])
