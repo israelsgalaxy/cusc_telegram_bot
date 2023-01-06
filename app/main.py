@@ -117,7 +117,6 @@ document
 
 message_dict = dict()
 
-
 def send_messages(ids: List[str], func, **kwargs):
     message_dict.clear()
     count = 0
@@ -131,11 +130,10 @@ def send_messages(ids: List[str], func, **kwargs):
         if count % 20 == 0:
             time.sleep(.7)
 
-
 @bot.message_handler(commands=['start'])
 def start_message_handler(message):
     chat = message.chat
-    # insert_new_user(chat.id, chat.type)
+    insert_new_user(chat.id, chat.type)
 
     if chat.type != "private":
         return
@@ -280,7 +278,7 @@ def getMessage():
 @server.route("/")
 def webhook():
     bot.remove_webhook()
-    bot.set_webhook(url=URL + TOKEN)
+    bot.set_webhook(url="https://" + VERCEL_URL + "/" + TOKEN)
     return "!", 200
 
 
