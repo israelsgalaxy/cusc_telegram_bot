@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.environ["TOKEN"]
-URL = os.environ["URL"]
+VERCEL_URL = os.environ["VERCEL_URL"]
 
 CHMN = int(os.environ["CHMN"])
 VCM = int(os.environ["VCM"])
