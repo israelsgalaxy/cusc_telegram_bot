@@ -5,25 +5,24 @@ from typing import List
 from .mongo import insert_new_user, get_ids, change_media_id, get_media_id
 
 import telebot
-from flask import Flask, request
+# from flask import Flask, request
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
 TOKEN = os.environ["TOKEN"]
-VERCEL_URL = os.environ["VERCEL_URL"]
-
-print(VERCEL_URL)
+# VERCEL_URL = os.environ["VERCEL_URL"]
 
 CHMN = int(os.environ["CHMN"])
 VCM = int(os.environ["VCM"])
 VCF = int(os.environ["VCF"])
 EXECSEC = int(os.environ["EXECSEC"])
 PRO = int(os.environ["PRO"])
+DEV = int(os.environ["DEV"])
 
-ADMIN = [CHMN, VCM, VCF, EXECSEC, PRO]
-server = Flask(__name__)
+ADMIN = [CHMN, VCM, VCF, EXECSEC, PRO, DEV]
+# server = Flask(__name__)
 
 categories = {
     "500": ["DAN", "EIE500", "EEE22", "CU2022"],
@@ -58,20 +57,20 @@ You can also connect with the student council through the [official Instagram pa
 admin_start_message = """
 All messages to this bot should follow either of these two formats:
 
-1) To broadcast a message:
-[categories]
-[message]
+1\) To broadcast a message:
+\[categories\]
+\[message\]
 
-2) To broadcast a message with an attachment (photo or document):
+2\) To broadcast a message with an attachment \(photo or document\):
 /sendmedia
-[categories]
-[message]
-[media_type]
+\[categories\]
+\[message\]
+\[media_type\]
 
 Here are the meanings and possible values of each field above:
 
-- categories
-Is a comma-separated list of groupings you wish to broadcast your message to
+\- categories
+Is a comma\-separated list of groupings you wish to broadcast your message to
 Can be any combination of gen,100,200,300,400,500,private,all
 
 gen comprises of all general groups
@@ -86,10 +85,10 @@ all comprises of all groups and DMs
 **NOTE:**
     The "all" and "private" categories cannot be used with any other category
 
-- message
+\- message
 Is the message content you wish to broadcast
 
-- media_type
+\- media_type
 Specifies what type of attachment you are including with your message
 Can be either photo or document
 
@@ -269,21 +268,23 @@ def save_new_media(message):
     change_media_id(media_id, type=type)
 
 
-@server.route("/" + TOKEN, methods=["POST"])
-def getMessage():
-    json_string = request.get_data().decode("utf-8")
-    update = telebot.types.Update.de_json(json_string)
-    bot.process_new_updates([update])
-    return "!", 200
+# @server.route("/" + TOKEN, methods=["POST"])
+# def getMessage():
+#     json_string = request.get_data().decode("utf-8")
+#     update = telebot.types.Update.de_json(json_string)
+#     bot.process_new_updates([update])
+#     return "!", 200
 
 
-@server.route("/")
-def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url="https://" + VERCEL_URL + "/" + TOKEN)
-    return "!", 200
+# @server.route("/")
+# def webhook():
+#     bot.remove_webhook()
+#     bot.set_webhook(url="https://" + VERCEL_URL + "/" + TOKEN)
+#     return "!", 200
 
 
 if __name__ == "__main__":
   print("Bot is alive")
-  server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+  # server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+  bot.remove_webhook()
+  bot.infinity_polling()
