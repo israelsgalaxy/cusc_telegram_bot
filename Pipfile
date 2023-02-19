@@ -7,9 +7,7 @@ name = "pypi"
 pytelegrambotapi = "*"
 python-dotenv = "*"
 schedule = "*"
-flask = "*"
 pymongo = {extras = ["srv"], version = "*"}
-gunicorn = "*"
 
 [dev-packages]
 autopep8 = "*"
